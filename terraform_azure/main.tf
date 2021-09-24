@@ -1,6 +1,10 @@
 ##############################################################################
 # Terraform and Ansible - Better Together
 
+provider "azurerm" {
+  features {}
+}
+
 resource "azurerm_resource_group" "terraform_ansible" {
   name     = "${var.resource_group}"
   location = "${var.location}"
@@ -17,7 +21,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = "${var.prefix}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name  = "${azurerm_resource_group.terraform_ansible.name}"
-  address_prefix       = "${var.subnet_prefix}"
+  address_prefixes       = "${var.subnet_prefix}"
 }
 
 resource "azurerm_network_security_group" "tf-ansible-sg" {
@@ -50,11 +54,16 @@ resource "azurerm_network_security_group" "tf-ansible-sg" {
   }
 }
 
+resource "azurerm_subnet_network_security_group_association" "example" {
+  subnet_id                 = "${azurerm_subnet.subnet.id}"
+  network_security_group_id = "${azurerm_network_security_group.tf-ansible-sg.id}"
+}
+
 resource "azurerm_network_interface" "tf-ansible-nic" {
   name                      = "${var.prefix}tf-ansible-nic"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.terraform_ansible.name}"
-  network_security_group_id = "${azurerm_network_security_group.tf-ansible-sg.id}"
+  
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
@@ -68,8 +77,9 @@ resource "azurerm_public_ip" "tf-ansible-pip" {
   name                         = "${var.prefix}-ip"
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.terraform_ansible.name}"
-  public_ip_address_allocation = "Dynamic"
+  allocation_method            = "Dynamic"
   domain_name_label            = "${var.hostname}"
+  
 }
 
 resource "azurerm_virtual_machine" "site" {
@@ -109,17 +119,17 @@ resource "azurerm_virtual_machine" "site" {
       }
   }
 
-  # This is to ensure SSH comes up before we run the local exec.
-  provisioner "remote-exec" { 
-    inline = ["echo 'Hello World'"]
+#   # This is to ensure SSH comes up before we run the local exec.
+#   provisioner "remote-exec" { 
+#     inline = ["echo 'Hello World'"]
 
-    connection {
-      type = "ssh"
-      host = "${azurerm_public_ip.tf-ansible-pip.fqdn}"
-      user = "${var.admin_username}"
-      private_key = "${var.ssh_key}"
-    }
-  }
+#     connection {
+#       type = "ssh"
+#       host = "${azurerm_public_ip.tf-ansible-pip.fqdn}"
+#       user = "${var.admin_username}"
+#       private_key = "${var.ssh_key}"
+#     }
+#   }
 
   provisioner "local-exec" {
     command = "ansible-playbook -i ../ansible/inventory.yaml --private-key ${var.ssh_key_path} ../ansible/httpd.yml"
