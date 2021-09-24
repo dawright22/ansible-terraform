@@ -29,12 +29,12 @@ variable "prefix" {
 
 variable "hostname" {
   description = "Virtual machine hostname. Used for local hostname, DNS, and storage-related names."
-  default     = "catapp"
+  default     = "bearapp"
 }
 
 variable "location" {
   description = "The region where the virtual network is created."
-  default     = "centralus"
+  default     = "Australia East"
 }
 
 variable "virtual_network_name" {
@@ -49,7 +49,7 @@ variable "address_space" {
 
 variable "subnet_prefix" {
   description = "The address prefix to use for the subnet."
-  default     = "10.0.10.0/24"
+  default     = ["10.0.2.0/24"]
 }
 
 variable "storage_account_tier" {
@@ -69,17 +69,17 @@ variable "vm_size" {
 
 variable "image_publisher" {
   description = "Name of the publisher of the image (az vm image list)"
-  default     = "RedHat"
+  default     = "OpenLogic"
 }
 
 variable "image_offer" {
   description = "Name of the offer (az vm image list)"
-  default     = "RHEL"
+  default     = "CentOS"
 }
 
 variable "image_sku" {
   description = "Image SKU to apply (az vm image list)"
-  default     = "7.3"
+  default     = "7.5"
 }
 
 variable "image_version" {
