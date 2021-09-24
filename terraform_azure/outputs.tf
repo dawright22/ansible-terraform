@@ -7,7 +7,7 @@
 # use an underscore _ to move things to the bottom. 
 
 output "_instructions" {
-  value = "This output contains plain text. You can add variables too."
+  value = "take the name from public_dns and update the ansible inventory http host to work with your instance"
 }
 
 output "public_dns" {
