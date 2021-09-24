@@ -7,7 +7,7 @@
 # use an underscore _ to move things to the bottom. 
 
 output "_instructions" {
-  value = "take the name from public_dns and update the ansible inventory http host to work with your instance"
+  value = "take the name from public_dns and update the ansible inventory http host to work with your instance. Then run ansible-playbook -i ../ansible/inventory.yaml --private-key ${var.ssh_key_path} ../ansible/httpd.yml"
 }
 
 output "public_dns" {
